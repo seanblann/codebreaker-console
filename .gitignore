@@ -15,5 +15,5 @@ bin/
 target/
 /captures/
 
-local.properties
+src/main/resources/local.properties
 HELP.md
