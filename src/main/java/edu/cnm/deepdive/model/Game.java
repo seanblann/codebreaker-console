@@ -2,6 +2,8 @@ package edu.cnm.deepdive.model;
 
 import com.google.gson.annotations.Expose;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class Game {
 
@@ -23,6 +25,9 @@ public class Game {
 
   @Expose
   private String text;
+
+  private final List<Guess> guesses = new LinkedList<>();
+
 
 
 
@@ -73,5 +78,9 @@ public class Game {
 
   public void setText(String text) {
     this.text = text;
+  }
+
+  public List<Guess> getGuesses() {
+    return guesses;
   }
 }
