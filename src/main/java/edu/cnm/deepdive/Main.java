@@ -15,16 +15,27 @@ public class Main {
   private static final String UNAVAILABLE_SERVICE_MESSAGE_KEY = "unavailable_service_message";
   private static final String WHITESPACE_PATTERN = "\\s+";
   private static final String MISSING_BUNDLE_FORMAT_KEY = "missing_bundle_format";
+  private static final String OUT_OF_RANGE_FORMAT_KEY = "out_of_range_format";
+  private static final int MINIMUM_CODE_LENGTH = 1;
+  private static final int MAXIMUM_CODE_LENGTH = 20;
+  private static final String PLAY_AGAIN_MESSAGE_KEY = "play_again_message";
+  private static final String NEGATIVE_RESPONSE_KEY = "negative_response";
 
   public static void main(String[] args) {
     ResourceBundle bundle = null;
+    int length = 0;
     try {
       bundle = ResourceBundle.getBundle(BUNDLE_BASE_NAME);
       String pool = (args.length > 0) ? args[0].replaceAll(WHITESPACE_PATTERN, "") : DEFAULT_POOL;
-      int length = (args.length > 1) ? Integer.parseInt(args[1]) : DEFAULT_LENGTH;
+      length = (args.length > 1) ? Integer.parseInt(args[1]) : DEFAULT_LENGTH;
+      if (length < MINIMUM_CODE_LENGTH || length > MAXIMUM_CODE_LENGTH) {
+        throw new IllegalArgumentException();
+      }
       Scanner scanner = new Scanner(System.in);
       Player player = new Player(scanner, System.out, bundle);
-      player.play(pool, length);
+      do {
+        player.play(pool, length);
+      } while (playAgain(bundle, scanner));
     } catch (MissingResourceException e) {
       //noinspection ConstantConditions
       System.out.printf(bundle.getString(MISSING_BUNDLE_FORMAT_KEY), BUNDLE_BASE_NAME);
@@ -32,10 +43,23 @@ public class Main {
     } catch (NumberFormatException e) {
       //noinspection ConstantConditions
       System.out.printf(bundle.getString(BAD_NUMBER_FORMAT_KEY), args[1]);
+    }catch(IllegalArgumentException e){
+        System.out.printf(
+            bundle.getString(OUT_OF_RANGE_FORMAT_KEY), length, MINIMUM_CODE_LENGTH, MAXIMUM_CODE_LENGTH);
     } catch (IOException e) {
       System.out.println(bundle.getString(UNAVAILABLE_SERVICE_MESSAGE_KEY));
       e.printStackTrace();
     }
+  }
+
+  private static boolean playAgain(ResourceBundle bundle, Scanner scanner) {
+    System.out.print(bundle.getString(PLAY_AGAIN_MESSAGE_KEY));
+    String response = scanner
+        .nextLine()
+        .trim()
+        .toLowerCase();
+    return (response.isEmpty()
+        || response.charAt(0) != bundle.getString(NEGATIVE_RESPONSE_KEY).charAt(0));
   }
 
 }
